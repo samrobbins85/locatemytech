@@ -1,4 +1,4 @@
-# hello_world
+# firebase_app
 
 A new Flutter project.
 

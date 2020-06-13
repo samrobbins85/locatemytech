@@ -1,75 +1,95 @@
-// Copyright 2018 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
 
 void main() => runApp(MyApp());
 
-// #docregion MyApp
+final dummySnapshot = [
+ {"name": "Filip", "votes": 15},
+ {"name": "Abraham", "votes": 14},
+ {"name": "Richard", "votes": 11},
+ {"name": "Ike", "votes": 10},
+ {"name": "Justin", "votes": 1},
+];
+
 class MyApp extends StatelessWidget {
-  // #docregion build
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      home: RandomWords(),
-    );
-  }
-  // #enddocregion build
+ @override
+ Widget build(BuildContext context) {
+   return MaterialApp(
+     title: 'Baby Names',
+     home: MyHomePage(),
+   );
+ }
 }
-// #enddocregion MyApp
 
-// #docregion RWS-var
-class RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _biggerFont = const TextStyle(fontSize: 18.0);
-  // #enddocregion RWS-var
-
-  // #docregion _buildSuggestions
-  Widget _buildSuggestions() {
-    return ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemBuilder: /*1*/ (context, i) {
-          if (i.isOdd) return Divider(); /*2*/
-
-          final index = i ~/ 2; /*3*/
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10)); /*4*/
-          }
-          return _buildRow(_suggestions[index]);
-        });
-  }
-  // #enddocregion _buildSuggestions
-
-  // #docregion _buildRow
-  Widget _buildRow(WordPair pair) {
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-    );
-  }
-  // #enddocregion _buildRow
-
-  // #docregion RWS-build
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Startup Name Generator'),
-      ),
-      body: _buildSuggestions(),
-    );
-  }
-  // #enddocregion RWS-build
-  // #docregion RWS-var
+class MyHomePage extends StatefulWidget {
+ @override
+ _MyHomePageState createState() {
+   return _MyHomePageState();
+ }
 }
-// #enddocregion RWS-var
 
-class RandomWords extends StatefulWidget {
-  @override
-  RandomWordsState createState() => RandomWordsState();
+class _MyHomePageState extends State<MyHomePage> {
+ @override
+ Widget build(BuildContext context) {
+   return Scaffold(
+     appBar: AppBar(title: Text('Baby Name Votes')),
+     body: _buildBody(context),
+   );
+ }
+
+ Widget _buildBody(BuildContext context) {
+ return StreamBuilder<QuerySnapshot>(
+   stream: Firestore.instance.collection('baby').snapshots(),
+   builder: (context, snapshot) {
+     if (!snapshot.hasData) return LinearProgressIndicator();
+
+     return _buildList(context, snapshot.data.documents);
+   },
+ );
+}
+
+ Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
+   return ListView(
+     padding: const EdgeInsets.only(top: 20.0),
+     children: snapshot.map((data) => _buildListItem(context, data)).toList(),
+   );
+ }
+
+ Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
+   final record = Record.fromSnapshot(data);
+
+   return Padding(
+     key: ValueKey(record.name),
+     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+     child: Container(
+       decoration: BoxDecoration(
+         border: Border.all(color: Colors.grey),
+         borderRadius: BorderRadius.circular(5.0),
+       ),
+       child: ListTile(
+         title: Text(record.name),
+         trailing: Text(record.votes.toString()),
+         onTap: () => record.reference.updateData({'votes': FieldValue.increment(1)}),
+       ),
+     ),
+   );
+ }
+}
+
+class Record {
+ final String name;
+ final int votes;
+ final DocumentReference reference;
+
+ Record.fromMap(Map<String, dynamic> map, {this.reference})
+     : assert(map['name'] != null),
+       assert(map['votes'] != null),
+       name = map['name'],
+       votes = map['votes'];
+
+ Record.fromSnapshot(DocumentSnapshot snapshot)
+     : this.fromMap(snapshot.data, reference: snapshot.reference);
+
+ @override
+ String toString() => "Record<$name:$votes>";
 }
