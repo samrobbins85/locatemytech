@@ -2,6 +2,13 @@ import 'main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+class FormPage extends StatefulWidget {
+  @override
+  FormPageState createState() {
+    return FormPageState();
+  }
+}
+
 class FormPageState extends State<FormPage> {
   @override
   Widget build(BuildContext context) {

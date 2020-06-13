@@ -1,43 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'main.dart';
 import 'add.dart';
-import 'configure.dart';
 
-void main() => runApp(MyApp());
-
-final dummySnapshot = [
-  {"name": "Filip", "votes": 15},
-  {"name": "Abraham", "votes": 14},
-  {"name": "Richard", "votes": 11},
-  {"name": "Ike", "votes": 10},
-  {"name": "Justin", "votes": 1},
-];
-
-class MyApp extends StatelessWidget {
+class ConfigurePage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Baby Names',
-      home: MyHomePage(),
-    );
+  _ConfigurePageState createState() {
+    return _ConfigurePageState();
   }
 }
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() {
-    return _MyHomePageState();
-  }
-}
+final SnackBar snackBar = const SnackBar(content: Text('Showing Snackbar'));
 
 
-
-class _MyHomePageState extends State<MyHomePage> {
+class _ConfigurePageState extends State<ConfigurePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Baby Name Votes')),
-      body: _buildBody(context),
+      key: scaffoldKey,
+      appBar: AppBar(title: Text('Baby Name Votes'),
+      actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.delete),
+          tooltip: "Show Snackbar" ,
+          onPressed: () {
+            scaffoldKey.currentState.showSnackBar(snackBar);
+          },)
+      ],),
+      body: _buildConfigureBody(context),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         child: Container(
@@ -50,26 +41,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 context, MaterialPageRoute(builder: (context) => FormPage()));
           },
           tooltip: "Increment Counter",
-          child: Icon(Icons.add)),
+          child: Icon(Icons.check)),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
 // tells you what's in the database??
 // gross af
-  Widget _buildBody(BuildContext context) {
+  Widget _buildConfigureBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('baby').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
 
-        return _buildList(context, snapshot.data.documents);
+        return _buildConfigureList(context, snapshot.data.documents);
       },
     );
   }
 
 // gets the actual values on the page
-  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
+  Widget _buildConfigureList(BuildContext context, List<DocumentSnapshot> snapshot) {
     return ListView(
       padding: const EdgeInsets.only(top: 20.0),
       children: snapshot.map((data) => _buildListItem(context, data)).toList(),
@@ -93,32 +84,9 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(record.name),
           trailing: Text(record.votes.toString()),
           onTap: () =>
-              Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ConfigurePage()))
+              record.reference.updateData({'votes': FieldValue.increment(1)}),
         ),
       ),
     );
   }
 }
-
-// what
-class Record {
-  final String name;
-  final int votes;
-  final DocumentReference reference;
-
-  Record.fromMap(Map<String, dynamic> map, {this.reference})
-      : assert(map['name'] != null),
-        assert(map['votes'] != null),
-        name = map['name'],
-        votes = map['votes'];
-
-  Record.fromSnapshot(DocumentSnapshot snapshot)
-      : this.fromMap(snapshot.data, reference: snapshot.reference);
-
-  @override
-  String toString() => "Record<$name:$votes>";
-}
-
-// Note, you can get the ID using record.reference.documentID
-
