@@ -90,11 +90,13 @@ class _MyHomePageState extends State<MyHomePage> {
           borderRadius: BorderRadius.circular(5.0),
         ),
         child: ListTile(
-          title: Text(record.name),
+          title: Text(record.name.toString()),
           trailing: Text(record.votes.toString()),
           onTap: () =>
+          // Firestore.instance.collection("baby").document(record.reference.documentID.toString()).delete()
+
               Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ConfigurePage()))
+                context, MaterialPageRoute(builder: (context) => ConfigurePage(todo:record)))
         ),
       ),
     );

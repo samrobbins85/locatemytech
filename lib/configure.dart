@@ -1,33 +1,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'main.dart';
 import 'add.dart';
 
 class ConfigurePage extends StatefulWidget {
+  final Record todo;
+  ConfigurePage({Key key, @required this.todo}) : super(key: key);
   @override
   _ConfigurePageState createState() {
     return _ConfigurePageState();
   }
 }
+
 final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
 final SnackBar snackBar = const SnackBar(content: Text('Showing Snackbar'));
-
 
 class _ConfigurePageState extends State<ConfigurePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      appBar: AppBar(title: Text('Baby Name Votes'),
-      actions: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.delete),
-          tooltip: "Show Snackbar" ,
-          onPressed: () {
-            scaffoldKey.currentState.showSnackBar(snackBar);
-          },)
-      ],),
+      appBar: AppBar(
+        title: Text(widget.todo.toString()),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.delete),
+            tooltip: "Show Snackbar",
+            onPressed: () {
+              Firestore.instance.collection("baby").document(widget.todo.reference.documentID.toString()).delete();
+              Navigator.popUntil(context, ModalRoute.withName('/'));
+            },
+          )
+        ],
+      ),
       body: _buildConfigureBody(context),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -60,7 +67,8 @@ class _ConfigurePageState extends State<ConfigurePage> {
   }
 
 // gets the actual values on the page
-  Widget _buildConfigureList(BuildContext context, List<DocumentSnapshot> snapshot) {
+  Widget _buildConfigureList(
+      BuildContext context, List<DocumentSnapshot> snapshot) {
     return ListView(
       padding: const EdgeInsets.only(top: 20.0),
       children: snapshot.map((data) => _buildListItem(context, data)).toList(),
