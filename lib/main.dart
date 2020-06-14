@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Baby Names',
+      title: 'Locate My Tech',
       home: MyHomePage(),
     );
   }
@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Baby Name Votes')),
+      appBar: AppBar(title: Text('Locate My Tech')),
       body: _buildBody(context),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
 // gross af
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('baby').snapshots(),
+      stream: Firestore.instance.collection('components').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
 
@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         child: ListTile(
           title: Text(record.name.toString()),
-          trailing: Text(record.votes.toString()),
+          trailing: Text(record.quantity.toString()),
           onTap: () =>
           // Firestore.instance.collection("baby").document(record.reference.documentID.toString()).delete()
 
@@ -106,20 +106,20 @@ class _MyHomePageState extends State<MyHomePage> {
 // what
 class Record {
   final String name;
-  final int votes;
+  final int quantity;
   final DocumentReference reference;
 
   Record.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['name'] != null),
-        assert(map['votes'] != null),
+        assert(map['quantity'] != null),
         name = map['name'],
-        votes = map['votes'];
+        quantity = map['quantity'];
 
   Record.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
 
   @override
-  String toString() => "Record<$name:$votes>";
+  String toString() => "Record<$name:$quantity>";
 }
 
 // Note, you can get the ID using record.reference.documentID

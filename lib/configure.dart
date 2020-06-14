@@ -29,7 +29,7 @@ class _ConfigurePageState extends State<ConfigurePage> {
             icon: const Icon(Icons.delete),
             tooltip: "Show Snackbar",
             onPressed: () {
-              Firestore.instance.collection("baby").document(widget.todo.reference.documentID.toString()).delete();
+              Firestore.instance.collection("components").document(widget.todo.reference.documentID.toString()).delete();
               Navigator.popUntil(context, ModalRoute.withName('/'));
             },
           )
@@ -57,7 +57,7 @@ class _ConfigurePageState extends State<ConfigurePage> {
 // gross af
   Widget _buildConfigureBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('baby').snapshots(),
+      stream: Firestore.instance.collection('components').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
 
@@ -90,9 +90,9 @@ class _ConfigurePageState extends State<ConfigurePage> {
         ),
         child: ListTile(
           title: Text(record.name),
-          trailing: Text(record.votes.toString()),
+          trailing: Text(record.quantity.toString()),
           onTap: () =>
-              record.reference.updateData({'votes': FieldValue.increment(1)}),
+              record.reference.updateData({'quantity': FieldValue.increment(1)}),
         ),
       ),
     );

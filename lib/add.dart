@@ -13,7 +13,7 @@ class FormPageState extends State<FormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Baby Name Votes')),
+      appBar: AppBar(title: Text('Locate My Tech')),
       body: MyCustomForm(),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -79,9 +79,9 @@ class MyCustomFormState extends State<MyCustomForm> {
             child: RaisedButton(
               onPressed: () {
                 Firestore.instance
-                    .collection("baby")
+                    .collection("components")
                     .document()
-                    .setData({'name': myController.text, 'votes': 0});
+                    .setData({'name': myController.text, 'quantity': 0});
                 Navigator.popUntil(context, ModalRoute.withName('/'));
           },    
 
