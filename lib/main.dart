@@ -31,40 +31,35 @@ class MyHomePage extends StatefulWidget {
   }
 }
 
-
-
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Locate my tech')),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text("Locate my tech"),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),),
-              ListTile(
-                title: Text("Homepage"),
-                onTap: (){
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: Text("Projects"),
-                onTap: (){
-                  Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ProjectPage()));
-          }
-                
-              )
-          ],
-
-        )
-      ),
+          child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            child: Text("Locate my tech"),
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+          ),
+          ListTile(
+            title: Text("Homepage"),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+              title: Text("Projects"),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ProjectPage()));
+              })
+        ],
+      )),
       body: _buildBody(context),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -118,14 +113,15 @@ class _MyHomePageState extends State<MyHomePage> {
           borderRadius: BorderRadius.circular(5.0),
         ),
         child: ListTile(
-          title: Text(record.name.toString()),
-          trailing: Text(record.quantity.toString()),
-          onTap: () =>
-          // Firestore.instance.collection("baby").document(record.reference.documentID.toString()).delete()
+            title: Text(record.name.toString()),
+            trailing: Text(record.quantity.toString()),
+            onTap: () =>
+                // Firestore.instance.collection("baby").document(record.reference.documentID.toString()).delete()
 
-              Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ConfigurePage(todo:record)))
-        ),
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ConfigurePage(todo: record)))),
       ),
     );
   }
@@ -136,14 +132,18 @@ class Record {
   final String name;
   final int quantity;
   final String description;
+  final String projects;
+  // var project = [];
   final DocumentReference reference;
 
   Record.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['name'] != null),
-        assert(map['quantity'] != null),
+        // assert(map['quantity'] != null),
         name = map['name'],
         quantity = map['quantity'],
-        description = map['description'];
+        description = map['description'],
+        projects=map["projects"];
+  // project = map['projects'];
 
   Record.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
@@ -153,4 +153,3 @@ class Record {
 }
 
 // Note, you can get the ID using record.reference.documentID
-
