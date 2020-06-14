@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'add.dart';
 import 'configure.dart';
+import 'projects.dart';
 
 void main() => runApp(MyApp());
 
@@ -55,8 +56,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ListTile(
                 title: Text("Projects"),
                 onTap: (){
-                  Navigator.pop(context);
-                }
+                  Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ProjectPage()));
+          }
+                
               )
           ],
 
