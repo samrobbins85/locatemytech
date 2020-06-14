@@ -16,7 +16,9 @@ class ConfigurePage extends StatefulWidget {
 final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
 final SnackBar snackBar = const SnackBar(content: Text('Showing Snackbar'));
-bool edit = false;
+bool edit_name = false;
+bool edit_desc = false;
+bool edit_quan = false;
 
 class _ConfigurePageState extends State<ConfigurePage> {
   @override
@@ -56,14 +58,16 @@ class _ConfigurePageState extends State<ConfigurePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
-  
-  String help = widget.todo.name;
-  final nameController = new TextEditingController(text: "Help");
 
+  final nameController = new TextEditingController();
+final descriptionController = new TextEditingController();
+final quantityController = new TextEditingController();
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     nameController.dispose();
+    descriptionController.dispose();
+    quantityController.dispose();
     super.dispose();
   }
 
@@ -72,10 +76,8 @@ class _ConfigurePageState extends State<ConfigurePage> {
       Row(children: <Widget>[
         Expanded(
             flex: 1,
-            child: edit
-                ? Form(
-                    child: TextFormField(
-                        controller: nameController))
+            child: edit_name
+                ? Form(child: TextFormField(controller: nameController))
                 : Text(
                     widget.todo.name,
                     textAlign: TextAlign.center,
@@ -83,77 +85,72 @@ class _ConfigurePageState extends State<ConfigurePage> {
         Expanded(
             flex: 1,
             child: IconButton(
-              icon: Icon(edit ? Icons.check : Icons.edit),
+              icon: Icon(edit_name ? Icons.check : Icons.edit),
               onPressed: () => setState(() {
-                if (edit) {
+                if (edit_name) {
                   Firestore.instance
                       .collection("components")
                       .document(widget.todo.reference.documentID.toString())
                       .updateData({'name': nameController.text});
+                  Navigator.popUntil(context, ModalRoute.withName('/'));
                 }
-                edit = !edit;
+                
+                edit_name = !edit_name;
               }),
             ))
       ]),
-      Row(children: <Widget>[
-        Text(widget.todo.description.toString()),
-        IconButton(
-          icon: new Icon(Icons.edit),
-          onPressed: () => Navigator.pop(context),
-        )
+Row(children: <Widget>[
+        Expanded(
+            flex: 1,
+            child: edit_desc
+                ? Form(child: TextFormField(controller: descriptionController))
+                : Text(
+                    widget.todo.description,
+                    textAlign: TextAlign.center,
+                  )),
+        Expanded(
+            flex: 1,
+            child: IconButton(
+              icon: Icon(edit_desc ? Icons.check : Icons.edit),
+              onPressed: () => setState(() {
+                if (edit_desc) {
+                  Firestore.instance
+                      .collection("components")
+                      .document(widget.todo.reference.documentID.toString())
+                      .updateData({'description': descriptionController.text});
+                  Navigator.popUntil(context, ModalRoute.withName('/'));
+                }
+                
+                edit_desc = !edit_desc;
+              }),
+            ))
       ]),
-      Row(children: <Widget>[
-        Text(widget.todo.quantity.toString()),
-        IconButton(
-          icon: new Icon(Icons.edit),
-          onPressed: () => Navigator.pop(context),
-        )
+Row(children: <Widget>[
+        Expanded(
+            flex: 1,
+            child: edit_quan
+                ? Form(child: TextFormField(controller: quantityController))
+                : Text(
+                    widget.todo.quantity.toString(),
+                    textAlign: TextAlign.center,
+                  )),
+        Expanded(
+            flex: 1,
+            child: IconButton(
+              icon: Icon(edit_quan ? Icons.check : Icons.edit),
+              onPressed: () => setState(() {
+                if (edit_quan) {
+                  Firestore.instance
+                      .collection("components")
+                      .document(widget.todo.reference.documentID.toString())
+                      .updateData({'quantity': int.parse(quantityController.text)});
+                  Navigator.popUntil(context, ModalRoute.withName('/'));
+                }
+                
+                edit_quan = !edit_quan;
+              }),
+            ))
       ])
     ]);
-  }
-
-// tells you what's in the database??
-// gross af
-  // Widget _buildConfigureBody(BuildContext context) {
-  //   return StreamBuilder<QuerySnapshot>(
-  //     stream: Firestore.instance.collection('components').snapshots(),
-  //     builder: (context, snapshot) {
-  //       if (!snapshot.hasData) return LinearProgressIndicator();
-
-  //       return _buildConfigureList(context, snapshot.data.documents);
-  //     },
-  //   );
-  // }
-
-// gets the actual values on the page
-  Widget _buildConfigureList(
-      BuildContext context, List<DocumentSnapshot> snapshot) {
-    return ListView(
-      padding: const EdgeInsets.only(top: 20.0),
-      children: snapshot.map((data) => _buildListItem(context, data)).toList(),
-    );
-  }
-
-// makes the actual page item
-// does the incrementing stuff also
-  Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
-    final record = Record.fromSnapshot(data);
-
-    return Padding(
-      key: ValueKey(record.name),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: ListTile(
-          title: Text(record.name),
-          trailing: Text(record.quantity.toString()),
-          onTap: () => record.reference
-              .updateData({'quantity': FieldValue.increment(1)}),
-        ),
-      ),
-    );
   }
 }
