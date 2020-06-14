@@ -27,9 +27,12 @@ class _ConfigurePageState extends State<ConfigurePage> {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.delete),
-            tooltip: "Show Snackbar",
+            tooltip: "Delete",
             onPressed: () {
-              Firestore.instance.collection("components").document(widget.todo.reference.documentID.toString()).delete();
+              Firestore.instance
+                  .collection("components")
+                  .document(widget.todo.reference.documentID.toString())
+                  .delete(); // the actual data from main.dart
               Navigator.popUntil(context, ModalRoute.withName('/'));
             },
           )
@@ -47,24 +50,57 @@ class _ConfigurePageState extends State<ConfigurePage> {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => FormPage()));
           },
-          tooltip: "Increment Counter",
+          tooltip: "Save",
           child: Icon(Icons.check)),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
+  Widget _buildConfigureBody(BuildContext context) {
+    bool edit;
+    return Column(children: <Widget>[
+      Row(children: <Widget>[
+        Text(widget.todo.name),
+        IconButton(
+          icon: edit ? new Icon(Icons.check): new Icon(Icons.edit),
+          onPressed: () => setState(() {
+            if (edit) {
+              edit = false;
+            }else{
+              edit=true;
+            }
+          }),
+        )
+      ]),
+      Row(children: <Widget>[
+        Text(widget.todo.description.toString()),
+        IconButton(
+          icon: new Icon(Icons.edit),
+          onPressed: () => Navigator.pop(context),
+        )
+      ]),
+      Row(children: <Widget>[
+        Text(widget.todo.quantity.toString()),
+        IconButton(
+          icon: new Icon(Icons.edit),
+          onPressed: () => Navigator.pop(context),
+        )
+      ])
+    ]);
+  }
+
 // tells you what's in the database??
 // gross af
-  Widget _buildConfigureBody(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('components').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return LinearProgressIndicator();
+  // Widget _buildConfigureBody(BuildContext context) {
+  //   return StreamBuilder<QuerySnapshot>(
+  //     stream: Firestore.instance.collection('components').snapshots(),
+  //     builder: (context, snapshot) {
+  //       if (!snapshot.hasData) return LinearProgressIndicator();
 
-        return _buildConfigureList(context, snapshot.data.documents);
-      },
-    );
-  }
+  //       return _buildConfigureList(context, snapshot.data.documents);
+  //     },
+  //   );
+  // }
 
 // gets the actual values on the page
   Widget _buildConfigureList(
@@ -91,8 +127,8 @@ class _ConfigurePageState extends State<ConfigurePage> {
         child: ListTile(
           title: Text(record.name),
           trailing: Text(record.quantity.toString()),
-          onTap: () =>
-              record.reference.updateData({'quantity': FieldValue.increment(1)}),
+          onTap: () => record.reference
+              .updateData({'quantity': FieldValue.increment(1)}),
         ),
       ),
     );

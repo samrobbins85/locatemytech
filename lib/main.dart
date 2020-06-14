@@ -107,13 +107,15 @@ class _MyHomePageState extends State<MyHomePage> {
 class Record {
   final String name;
   final int quantity;
+  final String description;
   final DocumentReference reference;
 
   Record.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['name'] != null),
         assert(map['quantity'] != null),
         name = map['name'],
-        quantity = map['quantity'];
+        quantity = map['quantity'],
+        description = map['description'];
 
   Record.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
