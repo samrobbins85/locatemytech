@@ -16,6 +16,7 @@ class ConfigurePage extends StatefulWidget {
 final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
 final SnackBar snackBar = const SnackBar(content: Text('Showing Snackbar'));
+bool edit = false;
 
 class _ConfigurePageState extends State<ConfigurePage> {
   @override
@@ -55,22 +56,44 @@ class _ConfigurePageState extends State<ConfigurePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
+  
+  String help = widget.todo.name;
+  final nameController = new TextEditingController(text: "Help");
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    nameController.dispose();
+    super.dispose();
+  }
 
   Widget _buildConfigureBody(BuildContext context) {
-    bool edit;
     return Column(children: <Widget>[
       Row(children: <Widget>[
-        Text(widget.todo.name),
-        IconButton(
-          icon: edit ? new Icon(Icons.check): new Icon(Icons.edit),
-          onPressed: () => setState(() {
-            if (edit) {
-              edit = false;
-            }else{
-              edit=true;
-            }
-          }),
-        )
+        Expanded(
+            flex: 1,
+            child: edit
+                ? Form(
+                    child: TextFormField(
+                        controller: nameController))
+                : Text(
+                    widget.todo.name,
+                    textAlign: TextAlign.center,
+                  )),
+        Expanded(
+            flex: 1,
+            child: IconButton(
+              icon: Icon(edit ? Icons.check : Icons.edit),
+              onPressed: () => setState(() {
+                if (edit) {
+                  Firestore.instance
+                      .collection("components")
+                      .document(widget.todo.reference.documentID.toString())
+                      .updateData({'name': nameController.text});
+                }
+                edit = !edit;
+              }),
+            ))
       ]),
       Row(children: <Widget>[
         Text(widget.todo.description.toString()),
