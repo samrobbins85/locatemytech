@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'add.dart';
 import 'configure.dart';
+import 'projects.dart';
 
 void main() => runApp(MyApp());
 
@@ -36,7 +37,34 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Locate My Tech')),
+      appBar: AppBar(title: Text('Locate my tech')),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text("Locate my tech"),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),),
+              ListTile(
+                title: Text("Homepage"),
+                onTap: (){
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text("Projects"),
+                onTap: (){
+                  Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ProjectPage()));
+          }
+                
+              )
+          ],
+
+        )
+      ),
       body: _buildBody(context),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
