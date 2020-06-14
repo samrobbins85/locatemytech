@@ -36,7 +36,32 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Locate My Tech')),
+      appBar: AppBar(title: Text('Baby Name Votes')),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text("Locate my tech"),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),),
+              ListTile(
+                title: Text("Homepage"),
+                onTap: (){
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text("Projects"),
+                onTap: (){
+                  Navigator.pop(context);
+                }
+              )
+          ],
+
+        )
+      ),
       body: _buildBody(context),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
